@@ -87,6 +87,16 @@ void keypressCallback(GLFWwindow *window, int key, int scancode, int action,
   }
 }
 
+void framebufferSizeCallback(GLFWwindow *window, int width, int height) {
+  glViewport(0, 0, width, height);
+  std::cout << "Resolution Before: ";
+  printf("%hdx%hd\n", Globals::WIDTH, Globals::HEIGHT);
+  Globals::WIDTH = width;
+  Globals::HEIGHT = height;
+  std::cout << "Resolution After: ";
+  printf("%hdx%hd\n", Globals::WIDTH, Globals::HEIGHT);
+}
+
 void renderJuliaSet(std::vector<GLubyte> &pixels, double a0, double b0) {
 
   for (int y = 0; y < Globals::HEIGHT; ++y) {
@@ -140,6 +150,7 @@ void setupWindow(GLFWwindow *&window) {
 
   glfwMakeContextCurrent(window);
   glfwSetKeyCallback(window, keypressCallback);
+  glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
 }
 
 void updateTitle(GLFWwindow *&window, int fps, double a0, double b0) {
