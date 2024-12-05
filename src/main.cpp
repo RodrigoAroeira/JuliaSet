@@ -24,8 +24,11 @@ int main() {
   int CURRENT_FPS = 0;
   auto start = std::chrono::high_resolution_clock::now();
   while (!glfwWindowShouldClose(window)) {
+    glfwPollEvents();
+
     pixels.resize(Globals::WIDTH * Globals::HEIGHT * 3);
     auto current = std::chrono::high_resolution_clock::now();
+
     std::chrono::duration<double> elapsed = current - start;
 
     if (elapsed.count() >= 1) {
@@ -60,8 +63,6 @@ int main() {
                  pixels.data());
 
     glfwSwapBuffers(window);
-
-    glfwPollEvents();
   }
   glfwDestroyWindow(window);
   glfwTerminate();
