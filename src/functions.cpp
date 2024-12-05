@@ -1,13 +1,15 @@
 #include "functions.hpp"
-#include "constants.hpp"
 
 #include <GL/gl.h>
 #include <GLFW/glfw3.h>
+
 #include <algorithm>
 #include <cmath>
 #include <complex>
 #include <iostream>
 #include <vector>
+
+#include "globals.hpp"
 
 int juliaFunction(std::complex<double> &z, const std::complex<double> &c,
                   int maxIter) {
@@ -37,10 +39,10 @@ double mapRange(double value, double in_min, double in_max, double out_min,
 }
 
 void mapMouseToComplex(double mouseX, double mouseY, double &a0, double &b0) {
-  a0 = mapRange(mouseX, 0, Constants::WIDTH, -Constants::X_LIM,
-                Constants::X_LIM);
-  b0 = mapRange(mouseY, 0, Constants::HEIGHT, Constants::Y_LIM,
-                -Constants::Y_LIM);
+  a0 = mapRange(mouseX, 0, Globals::WIDTH, -Globals::Constants::X_LIM,
+                Globals::Constants::X_LIM);
+  b0 = mapRange(mouseY, 0, Globals::HEIGHT, Globals::Constants::Y_LIM,
+                -Globals::Constants::Y_LIM);
 }
 
 void keypressCallback(GLFWwindow *window, int key, int scancode, int action,
@@ -74,10 +76,10 @@ void keypressCallback(GLFWwindow *window, int key, int scancode, int action,
       double a0, b0;
       iss >> a0 >> b0;
       double aMap, bMap;
-      aMap = mapRange(a0, -Constants::X_LIM, Constants::X_LIM, 0,
-                      Constants::WIDTH),
-      bMap = mapRange(b0, Constants::Y_LIM, -Constants::Y_LIM, 0,
-                      Constants::HEIGHT);
+      aMap = mapRange(a0, -Globals::Constants::X_LIM, Globals::Constants::X_LIM,
+                      0, Globals::WIDTH),
+      bMap = mapRange(b0, Globals::Constants::Y_LIM, -Globals::Constants::Y_LIM,
+                      0, Globals::HEIGHT);
 
       glfwSetCursorPos(window, aMap, bMap);
     }
@@ -87,30 +89,30 @@ void keypressCallback(GLFWwindow *window, int key, int scancode, int action,
 
 void renderJuliaSet(std::vector<GLubyte> &pixels, double a0, double b0) {
 
-  for (int y = 0; y < Constants::HEIGHT; ++y) {
-    for (int x = 0; x < Constants::WIDTH; ++x) {
-      int idx = (y * Constants::WIDTH + x) * 3;
+  for (int y = 0; y < Globals::HEIGHT; ++y) {
+    for (int x = 0; x < Globals::WIDTH; ++x) {
+      int idx = (y * Globals::WIDTH + x) * 3;
 
-      double a =
-          mapRange(x, 0, Constants::WIDTH, -Constants::X_LIM, Constants::X_LIM);
+      double a = mapRange(x, 0, Globals::WIDTH, -Globals::Constants::X_LIM,
+                          Globals::Constants::X_LIM);
 
       // for some reason, the y axis is inverted in the window
       // so we need to invert it in the mapping
-      double b = mapRange(y, 0, Constants::HEIGHT, Constants::Y_LIM,
-                          -Constants::Y_LIM);
+      double b = mapRange(y, 0, Globals::HEIGHT, Globals::Constants::Y_LIM,
+                          -Globals::Constants::Y_LIM);
 
       std::complex<double> c(a0, b0);
       std::complex<double> z(a, b);
 
-      int n = juliaFunction(z, c, Constants::MAX_ITERATIONS);
+      int n = juliaFunction(z, c, Globals::Constants::MAX_ITERATIONS);
 
-      if (n == Constants::MAX_ITERATIONS) {
+      if (n == Globals::Constants::MAX_ITERATIONS) {
         pixels[idx] = 0;
         pixels[idx + 1] = 0;
         pixels[idx + 2] = 0;
       } else {
-        int co =
-            static_cast<int>(mapRange(n, 0, Constants::MAX_ITERATIONS, 0, 255));
+        int co = static_cast<int>(
+            mapRange(n, 0, Globals::Constants::MAX_ITERATIONS, 0, 255));
 
         pixels[idx] = co;
         pixels[idx + 1] = co;
@@ -127,7 +129,7 @@ void setupWindow(GLFWwindow *&window) {
     exit(EXIT_FAILURE);
   }
 
-  window = glfwCreateWindow(Constants::WIDTH, Constants::HEIGHT, "Julia Set",
+  window = glfwCreateWindow(Globals::WIDTH, Globals::HEIGHT, "Julia Set",
                             nullptr, nullptr);
 
   if (!window) {

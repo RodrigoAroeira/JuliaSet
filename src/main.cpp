@@ -1,12 +1,13 @@
-#include "constants.hpp"
-#include "functions.hpp"
-
 #include <GL/gl.h>
 #include <GLFW/glfw3.h>
+#include <complex.h>
+
 #include <chrono>
 #include <cmath>
-#include <complex.h>
 #include <vector>
+
+#include "functions.hpp"
+#include "globals.hpp"
 
 int main() {
 
@@ -14,8 +15,8 @@ int main() {
 
   setupWindow(window);
 
-  std::vector<GLubyte> pixels(Constants::WIDTH * Constants::HEIGHT * 3);
-  GLubyte *pixelsData = pixels.data();
+  std::vector<GLubyte> pixels;
+  double mouseX_old = 0, mouseY_old = 0;
   double mouseX, mouseY;
   double a0, b0;
 
@@ -23,6 +24,7 @@ int main() {
   int CURRENT_FPS = 0;
   auto start = std::chrono::high_resolution_clock::now();
   while (!glfwWindowShouldClose(window)) {
+    pixels.resize(Globals::WIDTH * Globals::HEIGHT * 3);
     auto current = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> elapsed = current - start;
 
@@ -38,6 +40,12 @@ int main() {
 
     glfwGetCursorPos(window, &mouseX, &mouseY);
 
+    if (mouseX == mouseX_old && mouseY == mouseY_old)
+      continue;
+
+    mouseX_old = mouseX;
+    mouseY_old = mouseY;
+
     mapMouseToComplex(mouseX, mouseY, a0, b0);
 
     updateTitle(window, CURRENT_FPS, a0, b0);
@@ -48,8 +56,8 @@ int main() {
 
     glRasterPos2i(-1, -1);
 
-    glDrawPixels(Constants::WIDTH, Constants::HEIGHT, GL_RGB, GL_UNSIGNED_BYTE,
-                 pixelsData);
+    glDrawPixels(Globals::WIDTH, Globals::HEIGHT, GL_RGB, GL_UNSIGNED_BYTE,
+                 pixels.data());
 
     glfwSwapBuffers(window);
 
