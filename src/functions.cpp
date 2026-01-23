@@ -3,30 +3,11 @@
 #include <GL/gl.h>
 #include <GLFW/glfw3.h>
 
-#include <algorithm>
 #include <cmath>
-#include <complex>
 #include <iostream>
-#include <vector>
+#include <sstream>
 
 #include "globals.hpp"
-
-int juliaFunction(std::complex<double> &z, const std::complex<double> &c,
-                  int maxIter) {
-    int n = 0;
-    while (std::abs(z) < 2 && n < maxIter) {
-        z = z * z + c;
-        n++;
-    }
-    return n;
-}
-
-void normalizePixels(std::vector<GLubyte> &pixels) {
-    int max = *std::max_element(pixels.begin(), pixels.end());
-    for (size_t i = 0; i < pixels.size(); ++i) {
-        pixels[i] = (GLubyte)mapRange(pixels[i], 0, max, 0, 255);
-    }
-}
 
 double mapRange(double value, double in_min, double in_max, double out_min,
                 double out_max) {
@@ -91,43 +72,7 @@ void framebufferSizeCallback(GLFWwindow *window, int width, int height) {
     glViewport(0, 0, width, height);
     Globals::WIDTH = width;
     Globals::HEIGHT = height;
-}
-
-void renderJuliaSet(std::vector<GLubyte> &pixels, double a0, double b0) {
-
-    for (int y = 0; y < Globals::HEIGHT; ++y) {
-        for (int x = 0; x < Globals::WIDTH; ++x) {
-            int idx = (y * Globals::WIDTH + x) * 3;
-
-            double a =
-                mapRange(x, 0, Globals::WIDTH, -Globals::Constants::X_LIM,
-                         Globals::Constants::X_LIM);
-
-            // for some reason, the y axis is inverted in the window
-            // so we need to invert it in the mapping
-            double b =
-                mapRange(y, 0, Globals::HEIGHT, Globals::Constants::Y_LIM,
-                         -Globals::Constants::Y_LIM);
-
-            std::complex<double> c(a0, b0);
-            std::complex<double> z(a, b);
-
-            int n = juliaFunction(z, c, Globals::Constants::MAX_ITERATIONS);
-
-            if (n == Globals::Constants::MAX_ITERATIONS) {
-                pixels[idx] = 0;
-                pixels[idx + 1] = 0;
-                pixels[idx + 2] = 0;
-            } else {
-                int co = static_cast<int>(
-                    mapRange(n, 0, Globals::Constants::MAX_ITERATIONS, 0, 255));
-
-                pixels[idx] = co;
-                pixels[idx + 1] = co;
-                pixels[idx + 2] = co;
-            }
-        }
-    }
+    Globals::resized = true;
 }
 
 void setupWindow(GLFWwindow *&window) {

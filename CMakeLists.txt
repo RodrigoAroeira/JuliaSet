@@ -11,15 +11,17 @@ find_package(PkgConfig REQUIRED)
 find_package(OpenGL REQUIRED)
 pkg_check_modules(glfw3 REQUIRED IMPORTED_TARGET glfw3)
 
+include_directories(include)
+include_directories(${CMAKE_SOURCE_DIR}/include)
 include_directories(${glfw3_INCLUDE_DIRS})
 link_directories(${glfw3_LIBRARY_DIRS})
 
 set(SRC_DIR "src")
-file(GLOB SRC_FILES "${SRC_DIR}/*.cpp")
+file(GLOB SRC_FILES "${SRC_DIR}/*.cpp" "${SRC_DIR}/*.c")
 
 add_executable(${PROJECT_NAME} ${SRC_FILES})
 
-target_include_directories(${PROJECT_NAME} PRIVATE headers)
+target_include_directories(${PROJECT_NAME} PRIVATE headers include)
 target_link_libraries(${PROJECT_NAME} PkgConfig::glfw3 OpenGL::GL)
 
 add_custom_target(
