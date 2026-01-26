@@ -35,6 +35,13 @@ void keypressCallback(GLFWwindow *window, int key, int scancode, int action,
     }
 
     switch (key) {
+    case GLFW_KEY_F: {
+        if (glfwGetWindowAttrib(window, GLFW_MAXIMIZED)) {
+            glfwRestoreWindow(window);
+        } else {
+            glfwMaximizeWindow(window);
+        }
+    } break;
     case GLFW_KEY_ESCAPE:
     case GLFW_KEY_Q:
         glfwSetWindowShouldClose(window, true);
