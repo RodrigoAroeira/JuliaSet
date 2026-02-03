@@ -6,15 +6,24 @@
 
 #include <chrono>
 #include <cstdlib>
+#include <fstream>
 #include <iostream>
+#include <sstream>
 #include <thread>
 
 #include "functions.hpp"
 #include "globals.hpp"
-#include "shaders.hpp"
 
 constexpr int FPS = 60;
 constexpr int FRAME_WAIT = 1000 / 60;
+
+#ifndef FRAG_PATH
+#define FRAG_PATH "shaders/fragment.glsl"
+#endif
+
+#ifndef VERT_PATH
+#define VERT_PATH "shaders/vertex.glsl"
+#endif
 
 int main() {
     GLFWwindow *window = nullptr;
@@ -25,8 +34,8 @@ int main() {
     }
 
     // --- Compile shaders from files ---
-    GLuint vertexShader = compileShader(GL_VERTEX_SHADER, vertSrc);
-    GLuint fragmentShader = compileShader(GL_FRAGMENT_SHADER, fragSrc);
+    GLuint vertexShader = compileShader(GL_VERTEX_SHADER, VERT_PATH);
+    GLuint fragmentShader = compileShader(GL_FRAGMENT_SHADER, FRAG_PATH);
 
     GLuint shaderProgram = glCreateProgram();
     glAttachShader(shaderProgram, vertexShader);
@@ -116,8 +125,17 @@ int main() {
     glfwTerminate();
 }
 
-GLuint compileShader(GLenum type, const std::string &src) {
-    const char *csrc = src.c_str();
+GLuint compileShader(GLenum type, const std::string &path) {
+    std::ifstream file{path};
+    if (!file.is_open()) {
+        return 0;
+    }
+
+    std::stringstream ss;
+    ss << file.rdbuf();
+
+    auto s = ss.str();
+    const char *csrc = s.c_str();
 
     GLuint shader = glCreateShader(type);
     glShaderSource(shader, 1, &csrc, nullptr);

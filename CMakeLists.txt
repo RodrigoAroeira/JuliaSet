@@ -24,6 +24,18 @@ add_executable(${PROJECT_NAME} ${SRC_FILES})
 target_include_directories(${PROJECT_NAME} PRIVATE headers include)
 target_link_libraries(${PROJECT_NAME} PkgConfig::glfw3 OpenGL::GL)
 
+if(NOT DEFINED FRAG_PATH)
+  target_compile_definitions(${PROJECT_NAME} PRIVATE
+    FRAG_PATH="${CMAKE_SOURCE_DIR}/shaders/fragment.glsl"
+  )
+endif()
+
+if(NOT DEFINED VERT_PATH)
+  target_compile_definitions(${PROJECT_NAME} PRIVATE
+    VERT_PATH="${CMAKE_SOURCE_DIR}/shaders/vertex.glsl"
+  )
+endif()
+
 add_custom_target(
   run
   COMMAND ${PROJECT_NAME}
