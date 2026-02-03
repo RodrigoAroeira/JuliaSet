@@ -1,6 +1,6 @@
 namespace Globals {
 short WIDTH = 640;
 short HEIGHT = 360;
-bool resized = false;
+bool PAUSED = false;
 // namespace Constants
 } // namespace Globals

@@ -72,6 +72,9 @@ void keypressCallback(GLFWwindow *window, int key, int scancode, int action,
             glfwSetCursorPos(window, aMap, bMap);
         }
     } break;
+    case GLFW_KEY_SPACE:
+        Globals::PAUSED = !Globals::PAUSED;
+        break;
     }
 }
 
@@ -79,7 +82,6 @@ void framebufferSizeCallback(GLFWwindow *window, int width, int height) {
     glViewport(0, 0, width, height);
     Globals::WIDTH = width;
     Globals::HEIGHT = height;
-    Globals::resized = true;
 }
 
 void setupWindow(GLFWwindow *&window) {

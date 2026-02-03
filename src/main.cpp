@@ -7,11 +7,14 @@
 #include <chrono>
 #include <cstdlib>
 #include <iostream>
-#include <sstream>
+#include <thread>
 
 #include "functions.hpp"
 #include "globals.hpp"
-#include "glsl.h"
+#include "shaders.hpp"
+
+constexpr int FPS = 60;
+constexpr int FRAME_WAIT = 1000 / 60;
 
 int main() {
     GLFWwindow *window = nullptr;
@@ -85,8 +88,11 @@ int main() {
         mapMouseToComplex(mouseX, mouseY, a0, b0);
         updateTitle(window, CURRENT_FPS, a0, b0);
 
-        if (mouseX == mouseX_old && mouseY == mouseY_old)
+        bool mouseStopped = (mouseX == mouseX_old && mouseY == mouseY_old);
+        if (mouseStopped || Globals::PAUSED) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(FRAME_WAIT));
             continue;
+        }
 
         mouseX_old = mouseX;
         mouseY_old = mouseY;

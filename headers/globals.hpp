@@ -4,7 +4,7 @@ namespace Globals {
 
 extern short WIDTH;
 extern short HEIGHT;
-extern bool resized;
+extern bool PAUSED;
 
 namespace Constants {
 
