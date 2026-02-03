@@ -1,8 +1,8 @@
 #pragma once
 #include <string>
 std::string fragSrc = {
-#embed "../fragment.glsl"
+#embed "../shaders/fragment.glsl"
 };
 std::string vertSrc = {
-#embed "../vertex.glsl"
+#embed "../shaders/vertex.glsl"
 };
