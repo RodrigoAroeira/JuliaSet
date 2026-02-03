@@ -67,7 +67,7 @@ int main() {
 
     int frames = 0;
     int CURRENT_FPS = 0;
-    auto start = std::chrono::high_resolution_clock::now();
+    auto start = std::chrono::system_clock::now();
     glfwSwapInterval(1);
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
@@ -75,7 +75,7 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT);
 
         glfwGetCursorPos(window, &mouseX, &mouseY);
-        auto now = std::chrono::high_resolution_clock::now();
+        auto now = std::chrono::system_clock::now();
         std::chrono::duration<double> elapsed = now - start;
         if (elapsed.count() >= 1) {
             CURRENT_FPS = frames;
