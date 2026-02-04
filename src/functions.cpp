@@ -75,6 +75,9 @@ void keypressCallback(GLFWwindow *window, int key, int scancode, int action,
     case GLFW_KEY_SPACE:
         Globals::PAUSED = !Globals::PAUSED;
         break;
+    case GLFW_KEY_R:
+        Globals::RELOAD = true;
+        break;
     }
 }
 
