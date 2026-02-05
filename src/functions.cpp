@@ -47,31 +47,6 @@ void keypressCallback(GLFWwindow *window, int key, int scancode, int action,
         glfwSetWindowShouldClose(window, true);
         break;
 
-    case GLFW_KEY_C: {
-        double mouseX, mouseY;
-        glfwGetCursorPos(window, &mouseX, &mouseY);
-        mapMouseToComplex(mouseX, mouseY, mouseX, mouseY);
-        std::string clipboard =
-            std::to_string(mouseX) + " " + std::to_string(mouseY);
-
-        glfwSetClipboardString(window, clipboard.c_str());
-    } break;
-
-    case GLFW_KEY_V: {
-        const char *clipboard = glfwGetClipboardString(window);
-        if (clipboard) {
-            std::istringstream iss(clipboard);
-            double a0, b0;
-            iss >> a0 >> b0;
-            double aMap, bMap;
-            aMap = mapRange(a0, -Globals::Constants::X_LIM,
-                            Globals::Constants::X_LIM, 0, Globals::WIDTH),
-            bMap = mapRange(b0, Globals::Constants::Y_LIM,
-                            -Globals::Constants::Y_LIM, 0, Globals::HEIGHT);
-
-            glfwSetCursorPos(window, aMap, bMap);
-        }
-    } break;
     case GLFW_KEY_SPACE:
         Globals::PAUSED = !Globals::PAUSED;
         break;
