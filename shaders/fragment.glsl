@@ -5,6 +5,8 @@ in vec2 fragPos;
 
 uniform vec2 uC;
 uniform int maxIter;
+uniform float zoom;
+uniform vec2 pan;
 
 const float PI = 3.14159265359;
 
@@ -29,7 +31,7 @@ vec3 palette(float t) {
 }
 
 float juliaFunction() {
-    vec2 z = fragPos * 2.0;
+    vec2 z = fragPos * zoom + pan;
     int i;
     for (i = 0; i < maxIter; i++) {
         z = complexPow(z, -2) + uC;

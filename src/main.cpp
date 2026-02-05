@@ -5,7 +5,6 @@
 
 #include <chrono>
 #include <iostream>
-#include <thread>
 
 #include "functions.hpp"
 #include "globals.hpp"
@@ -54,12 +53,12 @@ int main() {
         GLint uCLoc = shader.getLoc("uC");
         GLint maxIterLoc = shader.getLoc("maxIter");
         GLint zoomLoc = shader.getLoc("zoom");
-        return std::tuple{uCLoc, maxIterLoc, zoomLoc};
+        GLint panLoc = shader.getLoc("pan");
+        return std::tuple{uCLoc, maxIterLoc, zoomLoc, panLoc};
     };
 
-    auto [uCLoc, maxIterLoc, zoomLoc] = getUniforms();
+    auto [uCLoc, maxIterLoc, zoomLoc, panLoc] = getUniforms();
 
-    double mouseX_old = -1, mouseY_old = -1;
     double mouseX, mouseY;
     double a0, b0;
 
@@ -73,7 +72,7 @@ int main() {
             if (!shader.reload())
                 std::cout << "Reload failed\n";
             Globals::RELOAD = false;
-            std::tie(uCLoc, maxIterLoc, zoomLoc) = getUniforms();
+            std::tie(uCLoc, maxIterLoc, zoomLoc, panLoc) = getUniforms();
         }
 
         glClear(GL_COLOR_BUFFER_BIT);
@@ -89,22 +88,17 @@ int main() {
             ++frames;
         }
 
-        mapMouseToComplex(mouseX, mouseY, a0, b0);
         updateTitle(window, CURRENT_FPS, a0, b0);
 
-        bool mouseStopped = (mouseX == mouseX_old && mouseY == mouseY_old);
-        if (mouseStopped || Globals::PAUSED) {
-            std::this_thread::sleep_for(std::chrono::milliseconds(FRAME_WAIT));
-            continue;
+        if (!Globals::PAUSED) {
+            mapMouseToComplex(mouseX, mouseY, a0, b0);
         }
-
-        mouseX_old = mouseX;
-        mouseY_old = mouseY;
 
         shader.use();
         glUniform2f(uCLoc, static_cast<float>(a0), static_cast<float>(b0));
         glUniform1i(maxIterLoc, Globals::Constants::MAX_ITERATIONS);
-        glUniform1f(zoomLoc, 1.5f);
+        glUniform2f(panLoc, Globals::PAN_X, Globals::PAN_Y);
+        glUniform1f(zoomLoc, Globals::ZOOM);
 
         glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);

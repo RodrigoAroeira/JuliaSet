@@ -6,8 +6,15 @@
 #include <cmath>
 #include <iostream>
 #include <sstream>
+#include <tuple>
 
 #include "globals.hpp"
+
+std::tuple<double, double> getLimits() {
+    double x = Globals::Constants::X_LIM * Globals::ZOOM;
+    double y = Globals::Constants::Y_LIM * Globals::ZOOM;
+    return {x, y};
+}
 
 double mapRange(double value, double in_min, double in_max, double out_min,
                 double out_max) {
@@ -20,10 +27,10 @@ double mapRange(double value, double in_min, double in_max, double out_min,
 }
 
 void mapMouseToComplex(double mouseX, double mouseY, double &a0, double &b0) {
-    a0 = mapRange(mouseX, 0, Globals::WIDTH, -Globals::Constants::X_LIM,
-                  Globals::Constants::X_LIM);
-    b0 = mapRange(mouseY, 0, Globals::HEIGHT, Globals::Constants::Y_LIM,
-                  -Globals::Constants::Y_LIM);
+    auto [xlim, ylim] = getLimits();
+
+    a0 = mapRange(mouseX, 0, Globals::WIDTH, -xlim, xlim);
+    b0 = mapRange(mouseY, 0, Globals::HEIGHT, ylim, -ylim);
 }
 
 void keypressCallback(GLFWwindow *window, int key, int scancode, int action,
@@ -62,6 +69,61 @@ void framebufferSizeCallback(GLFWwindow *window, int width, int height) {
     Globals::HEIGHT = height;
 }
 
+void scrollCallback(GLFWwindow *, double, double yOffset) {
+    constexpr double zoomFactor = 1.1;
+
+    if (yOffset > 0)
+        Globals::ZOOM /= zoomFactor;
+    else
+        Globals::ZOOM *= zoomFactor;
+
+    std::cout << "Zoom: " << Globals::ZOOM << '\n';
+}
+
+static bool DRAGGING = false;
+static double LAST_X, LAST_Y;
+
+void mouseButCallback(GLFWwindow *window, int button, int action, int) {
+    switch (action) {
+    case GLFW_PRESS: {
+        switch (button) {
+        case GLFW_MOUSE_BUTTON_1: {
+            if (!DRAGGING) {
+                glfwGetCursorPos(window, &LAST_X, &LAST_Y);
+            }
+            DRAGGING = true;
+        } break;
+        case GLFW_MOUSE_BUTTON_3:
+            Globals::ZOOM = Globals::Constants::ZOOM_DEFAULT;
+            Globals::PAN_X = 0;
+            Globals::PAN_Y = 0;
+            break;
+        }
+    } break;
+    case GLFW_RELEASE:
+        if (button == GLFW_MOUSE_BUTTON_1)
+            DRAGGING = false;
+        break;
+    }
+}
+
+void cursorPosCallback(GLFWwindow *window, double x, double y) {
+    if (!DRAGGING)
+        return;
+
+    double dx = x - LAST_X;
+    double dy = y - LAST_Y;
+
+    LAST_X = x;
+    LAST_Y = y;
+
+    float ndc_dx = (float)dx / Globals::WIDTH;
+    float ndc_dy = (float)dy / Globals::HEIGHT;
+
+    Globals::PAN_X -= ndc_dx * Globals::ZOOM;
+    Globals::PAN_Y += ndc_dy * Globals::ZOOM;
+}
+
 void setupWindow(GLFWwindow *&window) {
 
     if (!glfwInit()) {
@@ -81,6 +143,9 @@ void setupWindow(GLFWwindow *&window) {
     glfwMakeContextCurrent(window);
     glfwSetKeyCallback(window, keypressCallback);
     glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
+    glfwSetScrollCallback(window, scrollCallback);
+    glfwSetMouseButtonCallback(window, mouseButCallback);
+    glfwSetCursorPosCallback(window, cursorPosCallback);
 }
 
 void updateTitle(GLFWwindow *&window, int fps, double a0, double b0) {
