@@ -77,7 +77,6 @@ int main() {
 
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glfwGetCursorPos(window, &mouseX, &mouseY);
         auto now = std::chrono::system_clock::now();
         std::chrono::duration<double> elapsed = now - start;
         if (elapsed.count() >= 1) {
@@ -88,6 +87,7 @@ int main() {
             ++frames;
         }
 
+        glfwGetCursorPos(window, &mouseX, &mouseY);
         updateTitle(window, CURRENT_FPS, a0, b0);
 
         if (!Globals::PAUSED) {

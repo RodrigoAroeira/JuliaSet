@@ -31,6 +31,9 @@ void mapMouseToComplex(double mouseX, double mouseY, double &a0, double &b0) {
 
     a0 = mapRange(mouseX, 0, Globals::WIDTH, -xlim, xlim);
     b0 = mapRange(mouseY, 0, Globals::HEIGHT, ylim, -ylim);
+
+    a0 += Globals::PAN_X;
+    b0 += Globals::PAN_Y;
 }
 
 void keypressCallback(GLFWwindow *window, int key, int scancode, int action,
@@ -81,7 +84,7 @@ void scrollCallback(GLFWwindow *, double, double yOffset) {
 }
 
 static bool DRAGGING = false;
-static double LAST_X, LAST_Y;
+static double START_PAN_X{}, START_PAN_Y{}, START_DRAG_X{}, START_DRAG_Y{};
 
 void mouseButCallback(GLFWwindow *window, int button, int action, int) {
     switch (action) {
@@ -89,9 +92,12 @@ void mouseButCallback(GLFWwindow *window, int button, int action, int) {
         switch (button) {
         case GLFW_MOUSE_BUTTON_1: {
             if (!DRAGGING) {
-                glfwGetCursorPos(window, &LAST_X, &LAST_Y);
+                DRAGGING = true;
+
+                START_PAN_X = Globals::PAN_X;
+                START_PAN_Y = Globals::PAN_Y;
+                glfwGetCursorPos(window, &START_DRAG_X, &START_DRAG_Y);
             }
-            DRAGGING = true;
         } break;
         case GLFW_MOUSE_BUTTON_3:
             Globals::ZOOM = Globals::Constants::ZOOM_DEFAULT;
@@ -111,17 +117,14 @@ void cursorPosCallback(GLFWwindow *window, double x, double y) {
     if (!DRAGGING)
         return;
 
-    double dx = x - LAST_X;
-    double dy = y - LAST_Y;
-
-    LAST_X = x;
-    LAST_Y = y;
+    double dx = x - START_DRAG_X;
+    double dy = y - START_DRAG_Y;
 
     float ndc_dx = (float)dx / Globals::WIDTH;
     float ndc_dy = (float)dy / Globals::HEIGHT;
 
-    Globals::PAN_X -= ndc_dx * Globals::ZOOM;
-    Globals::PAN_Y += ndc_dy * Globals::ZOOM;
+    Globals::PAN_X = START_PAN_X - (ndc_dx * 2.0f * Globals::ZOOM);
+    Globals::PAN_Y = START_PAN_Y + (ndc_dy * 2.0f * Globals::ZOOM);
 }
 
 void setupWindow(GLFWwindow *&window) {
